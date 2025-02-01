@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <h1>Photo: <%= photoName %></h1>
+    <a href="/gallery/<%= folderName %>">Back to Gallery</a>
+    <div class="photo-container">
+        <img src="/uploads/<%= folderName %>/<%= photoName %>" alt="<%= photoName %>">
+    </div>
+</body>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        text-align: center;
+        background-color: #f4f4f4;
+    }
+
+    .photo-container {
+        margin-top: 20px;
+    }
+
+    .photo-container img {
+        max-width: 90%; /* Limit the photo's width to 90% of the viewport */
+        max-height: 80vh; /* Limit the photo's height to 80% of the viewport */
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    a {
+        color: #6b46c1;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+</html>

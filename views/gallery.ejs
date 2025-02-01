@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= title %></title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/main.css">  <!-- Your custom styles should come last -->
+</head>
+<body>
+
+  <div class="gallery-header">
+    <h1><%= folderName %> Gallery</h1>
+    <a href="/">Back to Home</a>
+  </div>
+
+  <!-- <form action="/delete-folder/<%= encodeURIComponent(folderName) %>" method="POST">
+    <div class="center-delete-button">
+      <button type="submit" class="my-custom-delete-button" onclick="return confirm('Are you sure you want to delete this folder and all its contents?');">Delete Folder</button>
+    </div>
+  </form>
+
+  <form action="/upload/<%= encodeURIComponent(folderName) %>" method="POST" enctype="multipart/form-data">
+    <div class="upload-section">
+      <input type="file" name="image" required>
+      <button type="submit" class="upload-button">Upload Image</button>
+    </div>
+  </form>
+
+  <form action="/rename-folder/<%= encodeURIComponent(folderName) %>" method="POST">
+    <label for="newFolderName">New Folder Name:</label>
+    <input type="text" id="newFolderName" name="newFolderName" required>
+    <button type="submit">Rename Folder</button>
+  </form> -->
+
+  <div class="button-container">
+    
+    <!-- Upload Image Form -->
+    <form action="/upload/<%= encodeURIComponent(folderName) %>" method="POST" enctype="multipart/form-data">
+      <input type="file" name="image" required>
+        <button type="submit" class="custom-button upload-button">Upload Image</button>
+    </form>
+
+    <!-- Form for renaming the folder -->
+    <form action="/rename-folder/<%= encodeURIComponent(folderName) %>" method="POST">
+        <input type="text" id="newFolderName" name="newFolderName" placeholder="New Folder Name" required>
+        <button type="submit" class="custom-button rename-button">Rename Folder</button>
+    </form>
+
+    <!-- Delete folder form -->
+    <form action="/delete-folder/<%= encodeURIComponent(folderName) %>" method="POST">
+      <button type="submit" class="custom-button delete-button" onclick="return confirm('Are you sure you want to delete this folder and all its contents?');">Delete Folder</button>
+  </form>
+
+</div>
+
+
+  <!-- Image Gallery -->
+  <div class="image-gallery">
+    <% if (images && images.length > 0) { %>
+      <% images.forEach(image => { %>
+        <div class="image-item">
+          <a href="/photo/<%= encodeURIComponent(folderName) %>/<%= encodeURIComponent(image) %>">
+            <img src="/uploads/<%= encodeURIComponent(folderName) %>/<%= encodeURIComponent(image) %>" alt="<%= image %>">
+          </a>
+          <p class="image-name"><%= image %></p>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No images found in this folder.</p>
+    <% } %>
+  </div>
+</body>
+</html>
