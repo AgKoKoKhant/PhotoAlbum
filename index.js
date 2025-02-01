@@ -200,7 +200,12 @@ app.get("/about", (req, res) => {
 app.get("/contact", (req, res) => {
   res.render("contact.ejs", { title: "Contact", bodyClass: '', includeFooter: false });
 });
+// profile route
+app.get("/profile", (req, res) => {
+    res.render("profile.ejs", { title: "Profile" , bodyClass: '', includeFooter: false});
+  });
 
+  
 // Create folder route
 app.post('/create-folder', ensureAuthenticated, (req, res) => {
     const { folderName } = req.body; // Get the folder name from the form
