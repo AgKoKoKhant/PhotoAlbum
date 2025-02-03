@@ -121,7 +121,8 @@ app.get('/', ensureAuthenticated, (req, res) => {
             title: "Home Page", 
             folders, 
             bodyClass: 'bg-home', 
-            includeFooter: true
+            includeFooter: true,
+            user: req.user
         });
     } catch (err) {
         console.error('Error accessing the uploads directory:', err);
@@ -148,7 +149,8 @@ app.get('/gallery/:folderName', ensureAuthenticated, (req, res) => {
                 title: `${folderName} Gallery`, 
                 folderName, 
                 images, 
-                bodyClass: '', 
+                bodyClass: '',
+                user: req.user, 
                 includeFooter: false 
             });
         } else {
@@ -339,4 +341,3 @@ app.listen(port, () => {
 sequelize.sync().then(() => {
     console.log('Database synced');
   });
-
