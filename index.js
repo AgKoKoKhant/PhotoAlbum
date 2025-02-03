@@ -5,12 +5,11 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import multer from 'multer';
 import sequelize from './models/index.js';
-import User from './models/User.js'; // Updated to match case sensitivity
+import User from './models/User.js'; 
 import session from 'express-session';
 import passport from './config/passportConfig.js';
 import authRoutes from './routes/auth.js';
-import { ensureAuthenticated } from './middleware/auth.js';
-
+import { ensureAdmin, ensureAuthenticated } from './middleware/auth.js';
 
 // ES module fix for __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -37,6 +36,30 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+// Create the admin account if it doesn't exist
+const createAdminAccount = async () => {
+    try {
+        const adminUser = await User.findOne({ where: { username: 'admin' } });
+        if (!adminUser) {
+            await User.create({
+                username: 'admin',
+                password: 'apple12345', // In a real app, hash this password!
+                role: 'admin'
+            });
+            console.log('Admin account created successfully.');
+        }
+    } catch (err) {
+        console.error('Error creating admin account:', err);
+    }
+};
+
+// Sync database and create admin account
+sequelize.sync().then(() => {
+    createAdminAccount();
+    console.log('Database synced');
+});
+
+
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('layout', 'layout'); // assumes a 'layout.ejs' in views folder
@@ -59,7 +82,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middleware to make 'user' available in all EJS templates
 app.use((req, res, next) => {
     res.locals.user = req.user;
     next();
@@ -70,7 +92,7 @@ app.use('/auth', authRoutes);
 
 // View engine setup
 app.set('view engine', 'ejs');
-app.set('layout', 'layout'); // assumes a 'layout.ejs' in views folder
+app.set('layout', 'layout'); 
 app.set('views', path.join(__dirname, 'views'));
 
 app.get('/auth/login', (req, res) => {
@@ -106,8 +128,6 @@ app.get('/', ensureAuthenticated, (req, res) => {
         res.status(500).send('Error processing the home page');
     }
 });
-
-
 
 // Gallery route for folders
 app.get('/gallery/:folderName', ensureAuthenticated, (req, res) => {
@@ -152,7 +172,6 @@ app.get('/photo/:folderName/:photoName', ensureAuthenticated, (req, res) => {
     }
 
     try {
-        // Ensure the photo exists before rendering
         if (fs.existsSync(photoPath)) {
             res.render('photo', { 
                 title: photoName, 
@@ -170,27 +189,6 @@ app.get('/photo/:folderName/:photoName', ensureAuthenticated, (req, res) => {
     }
 });
 
-// Delete folder route
-app.post('/delete-folder/:folderName', ensureAuthenticated, (req, res) => {
-    const folderName = req.params.folderName;
-    const folderPath = path.join(__dirname, 'uploads', folderName);
-
-    // Create the uploads directory if it doesn't exist
-    if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-        fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
-    }
-
-    // Remove the folder and its contents
-    fs.rm(folderPath, { recursive: true, force: true }, (err) => {
-        if (err) {
-            console.error('Failed to delete the folder:', err);
-            return res.status(500).send('Failed to delete the folder.');
-        }
-        res.redirect('/'); // Redirect to the home page or wherever appropriate
-    });
-});
-
-
 // About photo route
 app.get("/about", (req, res) => {
   res.render("about.ejs", { title: "About" , bodyClass: '', includeFooter: false});
@@ -207,8 +205,8 @@ app.get("/profile", (req, res) => {
 
   
 // Create folder route
-app.post('/create-folder', ensureAuthenticated, (req, res) => {
-    const { folderName } = req.body; // Get the folder name from the form
+app.post('/create-folder', ensureAuthenticated,ensureAdmin, (req, res) => {
+    const { folderName } = req.body; 
     const dir = path.join(__dirname, 'uploads', folderName);
     const uploadsPath = path.join(__dirname, 'uploads');
 
@@ -239,9 +237,8 @@ app.post('/create-folder', ensureAuthenticated, (req, res) => {
     }
 });
 
-
-// Upload Route
-app.post("/upload/:folderName", upload.single("image"), (req, res) => {
+// Upload Image Route
+app.post("/upload/:folderName",ensureAuthenticated,ensureAdmin, upload.single("image"), (req, res) => {
     if (!req.file) {
         return res.status(400).send("No file uploaded.");
     }
@@ -271,9 +268,9 @@ app.post("/upload/:folderName", upload.single("image"), (req, res) => {
 });
 
 // Rename folder route
-app.post('/rename-folder/:oldFolderName', (req, res) => {
+app.post('/rename-folder/:oldFolderName',ensureAuthenticated,ensureAdmin, (req, res) => {
     const oldFolderName = req.params.oldFolderName;
-    const newFolderName = req.body.newFolderName; // Get the new folder name from the request body
+    const newFolderName = req.body.newFolderName; 
 
     const oldPath = path.join(__dirname, 'uploads', oldFolderName);
     const newPath = path.join(__dirname, 'uploads', newFolderName);
@@ -296,8 +293,29 @@ app.post('/rename-folder/:oldFolderName', (req, res) => {
             console.error('Error renaming folder:', err);
             return res.status(500).send('Failed to rename the folder.');
         }
-        //res.redirect('/'); // Redirect to the home page or the gallery page
+        //res.redirect('/'); 
         res.redirect(`/gallery/${encodeURIComponent(newFolderName)}`);
+    });
+});
+
+
+// Delete folder route
+app.post('/delete-folder/:folderName', ensureAuthenticated,ensureAdmin, (req, res) => {
+    const folderName = req.params.folderName;
+    const folderPath = path.join(__dirname, 'uploads', folderName);
+
+    // Create the uploads directory if it doesn't exist
+    if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
+        fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true });
+    }
+
+    // Remove the folder and its contents
+    fs.rm(folderPath, { recursive: true, force: true }, (err) => {
+        if (err) {
+            console.error('Failed to delete the folder:', err);
+            return res.status(500).send('Failed to delete the folder.');
+        }
+        res.redirect('/'); 
     });
 });
 
@@ -320,6 +338,5 @@ app.listen(port, () => {
 // Sync database
 sequelize.sync().then(() => {
     console.log('Database synced');
-    // Start the server here if you prefer to wait for the database to sync
   });
 

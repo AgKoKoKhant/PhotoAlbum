@@ -16,18 +16,26 @@ router.get('/register', (req, res) => {
   });
 });
 
-// Registration Handler
+// Register route for normal users
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
+
   try {
-    // Create new user
-    await User.create({ username, password });
-    res.redirect('/auth/login');
-  } catch (error) {
-    console.error('Registration Error:', error);
-    res.redirect('/auth/register');
+      // Check if the username already exists
+      const existingUser = await User.findOne({ where: { username } });
+      if (existingUser) {
+          return res.status(400).send('Username already exists');
+      }
+
+      // Create a new user with the role of 'user'
+      const user = await User.create({ username, password, role: 'user' });
+      res.redirect('/auth/login');
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Error registering user');
   }
 });
+
 
 // Login Page
 router.get('/login', (req, res) => {

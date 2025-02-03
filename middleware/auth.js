@@ -1,10 +1,14 @@
 // middleware/auth.js
-
-export function ensureAuthenticated(req, res, next) {
+export const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
-    // User is authenticated, proceed to the next middleware or route handler
-    return next();
+      return next();
   }
-  // User is not authenticated, redirect to the login page
   res.redirect('/auth/login');
-}
+};
+
+export const ensureAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.role === 'admin') {
+      return next();
+  }
+  res.status(403).send('Access denied. Only admins can perform this action.');
+};

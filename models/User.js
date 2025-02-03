@@ -1,38 +1,42 @@
-// models/User.js
-
-import { DataTypes, Model } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import sequelize from './index.js';
 import bcrypt from 'bcrypt';
 
-class User extends Model {
-  // Method to compare passwords
-  async isValidPassword(password) {
-    return await bcrypt.compare(password, this.password);
-  }
-}
-
-User.init(
-  {
+const User = sequelize.define('User', {
     username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true, // Ensure usernames are unique
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
     },
     password: {
-      type: DataTypes.STRING,
-      allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: false
     },
-  },
-  {
-    sequelize,
-    modelName: 'User',
-  }
-);
-
-// Hash password before saving to the database
-User.beforeCreate(async (user, options) => {
-  const saltRounds = 10;
-  user.password = await bcrypt.hash(user.password, saltRounds);
+    role: {
+        type: DataTypes.ENUM('admin', 'user'),
+        defaultValue: 'user' // Default role is 'user'
+    }
 });
+
+// Hash password before saving user
+User.beforeCreate(async (user) => {
+    if (!user.password.startsWith("$2b$")) { // Avoid rehashing an already hashed password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
+
+// Hash password before updating (e.g., password change)
+User.beforeUpdate(async (user) => {
+    if (!user.password.startsWith("$2b$")) { // Avoid rehashing if already hashed
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
+
+// Add method to compare passwords
+User.prototype.isValidPassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
 
 export default User;

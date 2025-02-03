@@ -14,7 +14,18 @@ passport.use(
       }
 
       // Validate password
-      const isMatch = await user.isValidPassword(password);
+      // const isMatch = await user.isValidPassword(password);
+      console.log("User found:", user);
+console.log("Stored Hashed Password:", user.password);
+console.log("Entered Password:", password);
+
+if (!user.isValidPassword) {
+    console.error("Error: isValidPassword is not defined on user.");
+}
+
+const isMatch = await user.isValidPassword(password);
+console.log("Password Match:", isMatch);
+
       if (!isMatch) {
         return done(null, false, { message: 'Incorrect password' });
       }
