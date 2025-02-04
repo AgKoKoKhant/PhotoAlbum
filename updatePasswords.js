@@ -1,5 +1,6 @@
 import User from './models/User.js';  // Adjust path if necessary
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 (async () => {
     try {
