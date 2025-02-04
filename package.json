@@ -4,6 +4,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
+    "postinstall": "npm rebuild sqlite3",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -24,7 +26,6 @@
   },
   "description": "",
   "engines": {
-    "node": "16.x"
+    "node": "18.x"
   }
 }
-
