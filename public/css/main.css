@@ -148,12 +148,17 @@ footer {
 
 .image-item {
     text-align: center;
+    position: relative;
     overflow: hidden;
     border: 2px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    aspect-ratio: 16 / 9; /* Modern approach for aspect ratio */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .image-item:hover {
@@ -163,19 +168,33 @@ footer {
 
 .image-item img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     transition: transform 0.3s ease;
 }
 
-.image-item img:hover {
+.image-item:hover img {
     transform: scale(1.05);
 }
 
 .image-name {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
     font-size: 14px;
-    color: #555;
-    padding: 10px 0;
+    text-align: center;
+    white-space: nowrap;
+    max-width: 90%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+
 
 /* Gallery Header */
 .gallery-header {
@@ -348,3 +367,29 @@ input[type="text"]:focus {
     outline: none;
     box-shadow: 0 0 5px rgba(107, 70, 193, 0.5);
 }
+
+/* added */
+/* For tablets and larger screens */
+@media (min-width: 768px) {
+    .folders-section {
+        display: flex;
+        justify-content: space-between;
+    }
+}
+
+/* For mobile phones */
+@media (max-width: 767px) {
+    .folders-section {
+        display: block;
+        padding: 10px;
+    }
+    .folders-section li {
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    .form-container {
+        width: 100%;
+        padding: 10px;
+    }
+}
+

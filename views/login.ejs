@@ -1,5 +1,18 @@
 <div class="container mt-5">
   <h2 class="mb-4">Login</h2>
+
+  <% if (typeof successMessage === "string" && successMessage.length > 0) { %>
+    <div class="alert alert-success">
+      <%= successMessage %>
+    </div>
+  <% } %>
+
+  <% if (typeof errorMessage === "string" && errorMessage.length > 0) { %>
+    <div class="alert alert-danger">
+      <%= errorMessage %>
+    </div>
+  <% } %>
+
   <form action="/auth/login" method="POST" class="col-md-6">
     <div class="form-group">
       <input type="text" name="username" class="form-control" placeholder="Username" required>

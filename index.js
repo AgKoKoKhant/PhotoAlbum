@@ -1,5 +1,6 @@
 import express from 'express';
 import expressLayouts from 'express-ejs-layouts';
+import flash from 'connect-flash';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -11,20 +12,18 @@ import passport from './config/passportConfig.js';
 import authRoutes from './routes/auth.js';
 import { ensureAdmin, ensureAuthenticated } from './middleware/auth.js';
 
-// ES module fix for __dirname
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Set up storage for uploaded files
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const folderName = req.params.folderName;
         const folderPath = path.join(__dirname, "uploads", folderName); 
 
-        // Create folder if it doesn’t exist
         if (!fs.existsSync(folderPath)) {
             fs.mkdirSync(folderPath, { recursive: true });
         }
@@ -77,6 +76,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
 }));
+app.use(flash());
 
 // Initialize Passport.js
 app.use(passport.initialize());
@@ -84,6 +84,14 @@ app.use(passport.session());
 
 app.use((req, res, next) => {
     res.locals.user = req.user;
+    next();
+});
+
+
+// Middleware to make flash messages available in all templates
+app.use((req, res, next) => {
+    res.locals.successMessage = req.flash("success") || null;
+    res.locals.errorMessage = req.flash("error") || null;
     next();
 });
 

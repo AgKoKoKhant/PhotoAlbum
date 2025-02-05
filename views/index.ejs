@@ -3,35 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
-<link rel="stylesheet" href="/css/main.css">  <!--  custom styles should come last -->
-    <title>Welcome to the Photo Album app</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/main.css">  <!-- custom styles should come last -->
+    <title>Welcome to the Lozti's Photo Album</title>
 </head>
 <body>
     <!-- Notification Message -->
     <% if (typeof message !== 'undefined') { %>
-    <div style="background-color: lightgreen; padding: 10px; margin-bottom: 20px;">
+    <div class="alert alert-success" role="alert">
         <%= message %>
     </div>
     <% } %>
 
-    <h1>Welcome to the Photo Album app</h1>
+    <div class="container">
+        <h1 class="text-center">Welcome to the Photo Album app</h1>
 
-    <!-- Available Folders Section for user admin -->
-    <% if (user.role === 'admin') { %>
-    <form action="/create-folder" method="post" style="margin: 20px 0;">
-        <input type="text" name="folderName" placeholder="Give A New Folder Name" required>
-        <button type="submit" class="my-custom-button">Create Folder</button>
-    </form>
-    <% } %>
+        <!-- Available Folders Section for user admin -->
+        <% if (user.role === 'admin') { %>
+        <div class="my-3">
+            <form action="/create-folder" method="post">
+                <div class="input-group">
+                    <input type="text" name="folderName" class="form-control" placeholder="Give A New Folder Name" required>
+                    <button type="submit" class="btn btn-primary my-custom-button">Create Folder</button>
+                </div>
+            </form>
+        </div>
+        <% } %>
 
-    <div class="folders-section">
-        <h5>Available Folders: </h5>
-        <ol>
-            <% folders.forEach(folder => { %>
-                <li><a href="/gallery/<%= folder %>"><%= folder %></a></li>
-            <% }) %>
-        </ol>
+        <div class="folders-section my-4">
+            <h5>Available Folders:</h5>
+            <ol>
+                <% folders.forEach(folder => { %>
+                    <li><a href="/gallery/<%= folder %>"><%= folder %></a></li>
+                <% }) %>
+            </ol>
+        </div>
     </div>
 </body>
 </html>

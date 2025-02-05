@@ -24,16 +24,22 @@ router.post('/register', async (req, res) => {
       // Check if the username already exists
       const existingUser = await User.findOne({ where: { username } });
       if (existingUser) {
-          return res.status(400).send('Username already exists');
+        req.flash('error', 'Username already exists');
+        return res.redirect('/auth/register');
       }
 
       // Create a new user with the role of 'user'
-      const user = await User.create({ username, password, role: 'user' });
-      res.redirect('/auth/login');
-  } catch (err) {
-      console.error(err);
-      res.status(500).send('Error registering user');
-  }
+  const user = await User.create({ username, password, role: 'user' });
+  req.flash('success', 'Registration successful. Please log in.');
+  return res.redirect("/auth/login");
+
+} 
+
+catch (err) {
+  console.error(err);
+  req.flash("error", "Registration failed. Please try again.");
+  return res.redirect("/auth/register");
+}
 });
 
 
@@ -44,6 +50,8 @@ router.get('/login', (req, res) => {
     bodyClass: '',
     includeFooter: false,
     user: req.user,
+    successMessage: req.flash('success'),  
+    errorMessage: req.flash('error'),
   });
 });
 
@@ -51,9 +59,16 @@ router.get('/login', (req, res) => {
 router.post(
   '/login',
   passport.authenticate('local', {
-    successRedirect: '/', // Redirect to homepage on success
-    failureRedirect: '/auth/login', // Redirect back to login on failure
-  })
+    successRedirect: '/',
+    failureRedirect: '/auth/login',
+    failureFlash: true  // Enable flash messages on failure
+  }),
+  (req, res) => {
+    
+    req.flash('success', 'You are now logged in!');
+    console.log('Login successful!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    res.redirect('/');
+  }
 );
 
 // Logout Handler
@@ -62,8 +77,11 @@ router.get('/logout', (req, res, next) => {
     if (err) {
       return next(err);
     }
+    req.flash('success', 'You have been logged out!');
+    console.log('success', 'You have been logged out!');
     res.redirect('/auth/login');
   });
 });
+
 
 export default router;
