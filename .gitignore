@@ -1,0 +1,27 @@
+ 
+# Ignore node_modules (dependencies)
+node_modules/
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore database files
+*.sqlite
+
+# Ignore uploaded files
+public/uploads/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary and cache files
+*.tmp
+*.cache
+
+# Ignore environment variable files
+.env
+
+# Optional: Ignore CSS or build output if auto-generated
+public/css/
